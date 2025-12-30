@@ -88,6 +88,8 @@ Generates a perfect maze (exactly one path between any two points) using the Rec
 | `autoPlay` | `boolean` | `false` | Start animation automatically |
 | `animationSpeed` | `number` | `50` | Delay between steps in milliseconds |
 | `showGrid` | `boolean` | `true` | Show grid lines |
+| `legend` | `boolean` | `true` | Toggle the legend panel |
+| `stepCount` | `boolean` | `true` | Toggle the step counter |
 | `colors` | `ColorScheme` | default theme | Custom color scheme (see below) |
 
 ### Algorithms
@@ -125,15 +127,21 @@ You can customize all colors used in the visualization by passing a `colors` obj
 import type { ColorScheme } from 'labyrinth';
 
 const customColors: ColorScheme = {
-  start: '#10b981',      // Start node color
-  end: '#dc2626',        // End node color
-  current: '#f59e0b',    // Current node being explored
-  visiting: '#fef3c7',   // Nodes in the frontier
-  visited: '#e5e7eb',    // Already visited nodes
-  path: '#8b5cf6',       // Final path color
-  background: '#ffffff', // Cell background
-  wall: '#374151',       // Wall color
-  grid: '#e5e7eb'        // Grid line color
+  start: '#10b981',        // Start node color
+  end: '#dc2626',          // End node color
+  current: '#f59e0b',      // Current node being explored
+  visiting: '#fef3c7',     // Nodes in the frontier
+  visited: '#e5e7eb',      // Already visited nodes
+  path: '#8b5cf6',         // Final path color
+  background: '#ffffff',   // Cell background
+  wall: '#374151',         // Wall color
+  grid: '#e5e7eb',         // Grid line color
+  legend: '#f3f4f6',       // Legend background
+  legendtext: '#1f2937',   // Legend text color
+  buttons: '#0ea5e9',      // Button background
+  buttonshover: '#0284c7', // Button hover background
+  buttonsdisabled: '#94a3b8', // Disabled button background
+  buttonstext: '#ffffff'   // Button text color
 };
 ```
 
@@ -179,6 +187,12 @@ interface ColorScheme {
   background?: string;
   wall?: string;
   grid?: string;
+  legend?: string;
+  legendtext?: string;
+  buttons?: string;
+  buttonshover?: string;
+  buttonsdisabled?: string;
+  buttonstext?: string;
 }
 ```
 

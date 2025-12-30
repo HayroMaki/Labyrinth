@@ -89,7 +89,7 @@
 		{cellSize}
 		{animationSpeed}
 		showGrid={false}
-		legend={false}
+		legend={true}
 		stepCount={false}
 	/>
 
