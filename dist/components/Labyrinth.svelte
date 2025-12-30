@@ -13,6 +13,7 @@
 		startNode?: string;
 		endNode?: string;
 		autoPlay?: boolean;
+		buttons?: boolean;
 		legend?: boolean;
 		stepCount?: boolean;
 		animationSpeed?: number;
@@ -29,6 +30,7 @@
 		startNode = '0,0',
 		endNode,
 		autoPlay = false,
+		buttons = true,
 		legend = true,
 		stepCount = true,
 		animationSpeed = 50,
@@ -267,11 +269,13 @@
 	</svg>
 
 	<div class="controls">
-		<button onclick={play} disabled={isPlaying}>Play</button>
-		<button onclick={pause} disabled={!isPlaying}>Pause</button>
-		<button onclick={reset}>Reset</button>
-		<button onclick={stepBackward} disabled={isPlaying || currentStepIndex === 0}>Step Back</button>
-		<button onclick={stepForward} disabled={isPlaying || currentStepIndex === steps.length}>Step Forward</button>
+		{#if buttons}
+			<button onclick={play} disabled={isPlaying}>Play</button>
+			<button onclick={pause} disabled={!isPlaying}>Pause</button>
+			<button onclick={reset}>Reset</button>
+			<button onclick={stepBackward} disabled={isPlaying || currentStepIndex === 0}>Step Back</button>
+			<button onclick={stepForward} disabled={isPlaying || currentStepIndex === steps.length}>Step Forward</button>
+		{/if}
 		{#if stepCount}
 			<span class="step-counter">
 				Step: {currentStepIndex} / {steps.length}

@@ -95,6 +95,7 @@
 		{animationSpeed}
 		showGrid={false}
 		legend={true}
+		buttons={false}
 		stepCount={false}
 		onControls={handleControls}
 	/>

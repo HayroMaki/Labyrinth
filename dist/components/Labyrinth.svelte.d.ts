@@ -8,6 +8,7 @@ interface Props {
     startNode?: string;
     endNode?: string;
     autoPlay?: boolean;
+    buttons?: boolean;
     legend?: boolean;
     stepCount?: boolean;
     animationSpeed?: number;
