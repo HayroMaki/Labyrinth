@@ -60,7 +60,11 @@ npm install labyrinth
   autoPlay={false}
   showGrid={true}
   colors={customColors}
+  onControls={(controls) => (labyrinthControls = controls)}
 />
+
+<button on:click={() => labyrinthControls?.play()}>Play</button>
+<button on:click={() => labyrinthControls?.pause()}>Pause</button>
 ```
 
 ## API Reference
@@ -91,6 +95,7 @@ Generates a perfect maze (exactly one path between any two points) using the Rec
 | `legend` | `boolean` | `true` | Toggle the legend panel |
 | `stepCount` | `boolean` | `true` | Toggle the step counter |
 | `colors` | `ColorScheme` | default theme | Custom color scheme (see below) |
+| `onControls` | `(controls: LabyrinthControls) => void` | `undefined` | Receive imperative control methods |
 
 ### Algorithms
 
@@ -147,6 +152,30 @@ const customColors: ColorScheme = {
 
 All color properties are optional - only specify the ones you want to override.
 
+### Imperative Controls
+
+You can access imperative controls (play/pause/reset/step) by providing `onControls`:
+
+```svelte
+<script lang="ts">
+  import { Labyrinth, generateLabyrinth } from '@hayro_o7/labyrinth';
+  import type { LabyrinthControls } from '@hayro_o7/labyrinth';
+
+  const graph = generateLabyrinth(20, 20);
+  let controls: LabyrinthControls | null = null;
+</script>
+
+<Labyrinth {graph} onControls={(c) => (controls = c)} />
+
+<div class="external-controls">
+  <button on:click={() => controls?.play()}>Play</button>
+  <button on:click={() => controls?.pause()}>Pause</button>
+  <button on:click={() => controls?.reset()}>Reset</button>
+  <button on:click={() => controls?.stepBackward()}>Step Back</button>
+  <button on:click={() => controls?.stepForward()}>Step Forward</button>
+</div>
+```
+
 ### Types
 
 ```typescript
@@ -193,6 +222,14 @@ interface ColorScheme {
   buttonshover?: string;
   buttonsdisabled?: string;
   buttonstext?: string;
+}
+
+interface LabyrinthControls {
+  play: () => void;
+  pause: () => void;
+  reset: () => void;
+  stepForward: () => void;
+  stepBackward: () => void;
 }
 ```
 

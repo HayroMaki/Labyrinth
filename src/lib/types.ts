@@ -61,3 +61,11 @@ export interface ColorScheme {
     buttonsdisabled?: string;
     buttonstext?: string;
 }
+
+export interface LabyrinthControls {
+	play: () => void;
+	pause: () => void;
+	reset: () => void;
+	stepForward: () => void;
+	stepBackward: () => void;
+}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { generateLabyrinth, Labyrinth } from '$lib';
-	import type { Graph, AlgorithmType } from '$lib';
+	import type { AlgorithmType, LabyrinthControls } from '$lib';
 
 	let width = $state(15);
 	let height = $state(15);
@@ -8,6 +8,7 @@
 	let cellSize = $state(30);
 	let animationSpeed = $state(50);
 	let seed = $state(0);
+	let controls = $state<LabyrinthControls | null>(null);
 
 	let graph = $derived.by(() => {
 		seed;
@@ -16,6 +17,10 @@
 
 	function regenerate() {
 		seed++;
+	}
+
+	function handleControls(api: LabyrinthControls) {
+		controls = api;
 	}
 </script>
 
@@ -91,7 +96,16 @@
 		showGrid={false}
 		legend={true}
 		stepCount={false}
+		onControls={handleControls}
 	/>
+
+	<div class="external-controls">
+		<button onclick={() => controls?.play()} disabled={!controls}>Play</button>
+		<button onclick={() => controls?.pause()} disabled={!controls}>Pause</button>
+		<button onclick={() => controls?.reset()} disabled={!controls}>Reset</button>
+		<button onclick={() => controls?.stepBackward()} disabled={!controls}>Step Back</button>
+		<button onclick={() => controls?.stepForward()} disabled={!controls}>Step Forward</button>
+	</div>
 
 	<div class="info-section">
 		<h2>About</h2>
@@ -253,5 +267,33 @@ const graph = generateLabyrinth(20, 20);
 	code {
 		font-family: 'Courier New', monospace;
 		font-size: 0.875rem;
+	}
+
+	.external-controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		justify-content: center;
+	}
+
+	.external-controls button {
+		padding: 0.5rem 1rem;
+		border: none;
+		border-radius: 0.375rem;
+		background-color: #2563eb;
+		color: white;
+		cursor: pointer;
+		font-weight: 600;
+		transition: background 0.2s;
+	}
+
+	.external-controls button:disabled {
+		background-color: #9ca3af;
+		cursor: not-allowed;
+	}
+
+	.external-controls button:not(:disabled):hover {
+		background-color: #1d4ed8;
 	}
 </style>
