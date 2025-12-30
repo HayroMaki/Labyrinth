@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Graph, AlgorithmType, PathStep } from '../types';
+	import type { Graph, AlgorithmType, PathStep, LabyrinthControls } from '../types';
 	import { dijkstra } from '../algorithms/dijkstra';
 	import { astar } from '../algorithms/astar';
 
@@ -18,6 +18,7 @@
 		animationSpeed?: number;
 		showGrid?: boolean;
 		colors?: ColorScheme;
+		onControls?: (controls: LabyrinthControls) => void;
 	}
 
 	let {
@@ -32,9 +33,9 @@
 		stepCount = true,
 		animationSpeed = 50,
 		showGrid = true,
-		colors
+		colors,
+		onControls
 	}: Props = $props();
-
 	const defaultColors: Required<ColorScheme> = {
 		start: '#22c55e',
 		end: '#ef4444',
@@ -182,6 +183,18 @@
 
 	const width = $derived(graph.width * cellSize);
 	const height = $derived(graph.height * cellSize);
+
+	const controlApi: LabyrinthControls = {
+		play,
+		pause,
+		reset,
+		stepForward,
+		stepBackward
+	};
+
+	$effect(() => {
+		onControls?.(controlApi);
+	});
 </script>
 
 <div class="labyrinth-container" style={cssVars}>

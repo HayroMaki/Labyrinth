@@ -1,4 +1,4 @@
-import type { Graph, AlgorithmType } from '../types';
+import type { Graph, AlgorithmType, LabyrinthControls } from '../types';
 import type { ColorScheme } from '../types';
 interface Props {
     graph: Graph;
@@ -13,6 +13,7 @@ interface Props {
     animationSpeed?: number;
     showGrid?: boolean;
     colors?: ColorScheme;
+    onControls?: (controls: LabyrinthControls) => void;
 }
 declare const Labyrinth: import("svelte").Component<Props, {}, "">;
 type Labyrinth = ReturnType<typeof Labyrinth>;
