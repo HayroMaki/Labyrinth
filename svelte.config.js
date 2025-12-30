@@ -10,14 +10,6 @@ const config = {
 		files: {
 			lib: 'src/lib'
 		}
-	},
-
-	package: {
-		dir: 'dist',
-		exports: (filepath) => {
-			return filepath === 'index.ts';
-		},
-		files: () => true
 	}
 };
 

@@ -1,0 +1,56 @@
+export interface Point {
+    x: number;
+    y: number;
+}
+export interface Cell {
+    x: number;
+    y: number;
+    walls: {
+        top: boolean;
+        right: boolean;
+        bottom: boolean;
+        left: boolean;
+    };
+    visited: boolean;
+}
+export interface GraphNode {
+    id: string;
+    x: number;
+    y: number;
+    neighbors: string[];
+}
+export interface Graph {
+    nodes: Map<string, GraphNode>;
+    width: number;
+    height: number;
+}
+export interface PathStep {
+    nodeId: string;
+    type: 'visiting' | 'visited' | 'path' | 'current';
+    distance?: number;
+    heuristic?: number;
+    fScore?: number;
+}
+export interface AlgorithmResult {
+    path: string[];
+    steps: PathStep[];
+    found: boolean;
+}
+export type AlgorithmType = 'dijkstra' | 'astar';
+export interface ColorScheme {
+    start?: string;
+    end?: string;
+    current?: string;
+    visiting?: string;
+    visited?: string;
+    path?: string;
+    background?: string;
+    wall?: string;
+    grid?: string;
+    legend?: string;
+    legendtext?: string;
+    buttons?: string;
+    buttonshover?: string;
+    buttonsdisabled?: string;
+    buttonstext?: string;
+}
