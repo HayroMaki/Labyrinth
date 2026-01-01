@@ -130,6 +130,7 @@ export function findOptimalMultiGoalPath(graph, startId, goalIds) {
     let shortestLength = Infinity;
     let bestPermIndex = -1;
     const goalPermutations = permutations(goalIds);
+    // First pass: find all valid permutations and the best one
     for (let permIndex = 0; permIndex < goalPermutations.length; permIndex++) {
         const perm = goalPermutations[permIndex];
         const tour = [startId, ...perm];
@@ -150,17 +151,6 @@ export function findOptimalMultiGoalPath(graph, startId, goalIds) {
         }
         if (valid) {
             testedPermutations.push({ path: totalPath, length: totalPath.length, tour });
-            // Add visualization step for this permutation test
-            for (const nodeId of totalPath) {
-                permutationSteps.push({
-                    nodeId,
-                    type: 'permutation-test',
-                    permutationIndex: permIndex,
-                    permutationPath: totalPath,
-                    permutationLength: totalPath.length,
-                    isBest: false
-                });
-            }
             if (totalPath.length < shortestLength) {
                 shortestPath = totalPath;
                 shortestLength = totalPath.length;
@@ -168,16 +158,19 @@ export function findOptimalMultiGoalPath(graph, startId, goalIds) {
             }
         }
     }
-    // Mark the best permutation
-    if (bestPermIndex >= 0) {
-        for (const nodeId of shortestPath) {
+    // Second pass: create visualization steps with correct isBest flag
+    for (let i = 0; i < testedPermutations.length; i++) {
+        const perm = testedPermutations[i];
+        const isBest = i === bestPermIndex;
+        const stepType = isBest ? 'permutation-best' : 'permutation-test';
+        for (const nodeId of perm.path) {
             permutationSteps.push({
                 nodeId,
-                type: 'permutation-best',
-                permutationIndex: bestPermIndex,
-                permutationPath: shortestPath,
-                permutationLength: shortestLength,
-                isBest: true
+                type: stepType,
+                permutationIndex: i,
+                permutationPath: perm.path,
+                permutationLength: perm.length,
+                isBest
             });
         }
     }

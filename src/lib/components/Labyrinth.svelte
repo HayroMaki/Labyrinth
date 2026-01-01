@@ -107,6 +107,11 @@
 			runAlgorithm();
 		}
 		
+		// Clear any existing interval to prevent accumulation
+		if (intervalId !== null) {
+			clearInterval(intervalId);
+		}
+		
 		isPlaying = true;
 		intervalId = window.setInterval(() => {
 			if (currentStepIndex < steps.length) {

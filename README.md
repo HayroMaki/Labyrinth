@@ -97,6 +97,21 @@ Generates a perfect maze (exactly one path between any two points) using the Rec
 | `colors` | `ColorScheme` | default theme | Custom color scheme (see below) |
 | `onControls` | `(controls: LabyrinthControls) => void` | `undefined` | Receive imperative control methods |
 
+### `GraphVisualizer` Component Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `graph` | `GeneralGraph` | **required** | The graph to visualize |
+| `startNode` | `string` | first node | Starting node ID |
+| `goalNodes` | `string[]` | `[]` | Array of goal node IDs |
+| `nodeRadius` | `number` | `20` | Radius of nodes in pixels |
+| `autoPlay` | `boolean` | `false` | Start animation automatically |
+| `animationSpeed` | `number` | `100` | Delay between steps in milliseconds |
+| `showMultiGoal` | `boolean` | `false` | Enable multi-goal pathfinding with permutation optimization |
+| `showNodeIds` | `boolean` | `true` | Display node IDs inside nodes |
+| `colors` | `ColorScheme` | default theme | Custom color scheme |
+| `onControls` | `(controls: LabyrinthControls) => void` | `undefined` | Receive imperative control methods |
+
 ### Algorithms
 
 #### Dijkstra's Algorithm

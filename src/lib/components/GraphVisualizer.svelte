@@ -11,6 +11,7 @@
 		animationSpeed?: number;
 		colors?: ColorScheme;
 		showMultiGoal?: boolean;
+		showNodeIds?: boolean;
 		onControls?: (controls: LabyrinthControls) => void;
 	}
 
@@ -23,6 +24,7 @@
 		animationSpeed = 100,
 		colors,
 		showMultiGoal = false,
+		showNodeIds = true,
 		onControls
 	}: Props = $props();
 
@@ -167,6 +169,12 @@
 				steps.push(...segmentResult.steps);
 			}
 			
+			// Add a "clear" step to reset colors before permutation testing
+			steps.push({
+				nodeId: '',
+				type: 'path' // Dummy step to trigger color reset
+			});
+			
 			// Then show permutation comparison phase
 			steps.push(...result.permutationSteps);
 		} else {
@@ -186,6 +194,11 @@
 	function play() {
 		if (steps.length === 0) {
 			runAlgorithm();
+		}
+
+		// Clear any existing interval to prevent accumulation
+		if (intervalId !== null) {
+			clearInterval(intervalId);
 		}
 
 		isPlaying = true;
@@ -300,7 +313,7 @@
 			{/if}
 		</div>
 	{/if}
-	<svg width={svgWidth} height={svgHeight} class="graph-svg">
+	<svg width={svgWidth} height={svgHeight}>
 		<defs>
 			<marker
 				id="arrowhead"
@@ -341,17 +354,19 @@
 				stroke={stroke}
 				stroke-width="3"
 			/>
-			<text
-				x={node.x}
-				y={node.y}
-				text-anchor="middle"
-				dominant-baseline="middle"
-				font-size="10"
-				font-weight="600"
-				fill={colorScheme.wall}
-			>
-				{node.id.replace('n', '')}
-			</text>
+			{#if showNodeIds}
+				<text
+					x={node.x}
+					y={node.y}
+					text-anchor="middle"
+					dominant-baseline="middle"
+					font-size="10"
+					font-weight="600"
+					fill={colorScheme.wall}
+				>
+					{node.id.replace('n', '')}
+				</text>
+			{/if}
 		{/each}
 	</svg>
 </div>
@@ -362,13 +377,6 @@
 		flex-direction: column;
 		gap: 1rem;
 		align-items: center;
-	}
-
-	.graph-svg {
-		background-color: white;
-		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-		border: 2px solid #e5e7eb;
-		border-radius: 0.5rem;
 	}
 
 	.permutation-info {

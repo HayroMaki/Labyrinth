@@ -8,6 +8,7 @@ interface Props {
     animationSpeed?: number;
     colors?: ColorScheme;
     showMultiGoal?: boolean;
+    showNodeIds?: boolean;
     onControls?: (controls: LabyrinthControls) => void;
 }
 declare const GraphVisualizer: import("svelte").Component<Props, {}, "">;
