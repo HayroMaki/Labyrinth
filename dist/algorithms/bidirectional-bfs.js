@@ -158,19 +158,32 @@ export function findOptimalMultiGoalPath(graph, startId, goalIds) {
             }
         }
     }
-    // Second pass: create visualization steps with correct isBest flag
+    // Second pass: create visualization steps - test all permutations first, then show best
     for (let i = 0; i < testedPermutations.length; i++) {
         const perm = testedPermutations[i];
-        const isBest = i === bestPermIndex;
-        const stepType = isBest ? 'permutation-best' : 'permutation-test';
+        // Always show as 'test' during iteration
         for (const nodeId of perm.path) {
             permutationSteps.push({
                 nodeId,
-                type: stepType,
+                type: 'permutation-test',
                 permutationIndex: i,
                 permutationPath: perm.path,
                 permutationLength: perm.length,
-                isBest
+                isBest: false
+            });
+        }
+    }
+    // Finally, show the best permutation
+    if (bestPermIndex >= 0 && testedPermutations[bestPermIndex]) {
+        const bestPerm = testedPermutations[bestPermIndex];
+        for (const nodeId of bestPerm.path) {
+            permutationSteps.push({
+                nodeId,
+                type: 'permutation-best',
+                permutationIndex: bestPermIndex,
+                permutationPath: bestPerm.path,
+                permutationLength: bestPerm.length,
+                isBest: true
             });
         }
     }

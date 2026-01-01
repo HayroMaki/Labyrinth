@@ -380,6 +380,7 @@
 	}
 
 	.permutation-info {
+		position: fixed;
 		padding: 0.75rem 1.5rem;
 		background-color: #f9fafb;
 		border: 2px solid #1f2937;
