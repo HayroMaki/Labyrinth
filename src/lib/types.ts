@@ -69,3 +69,35 @@ export interface LabyrinthControls {
 	stepForward: () => void;
 	stepBackward: () => void;
 }
+
+export interface GeneralGraphNode {
+	id: string;
+	x: number;
+	y: number;
+	neighbors: string[];
+}
+
+export interface GeneralGraph {
+	nodes: Map<string, GeneralGraphNode>;
+}
+
+export interface BFSStep {
+	nodeId: string;
+	type: 'start-forward' | 'start-backward' | 'goal-forward' | 'goal-backward' | 'visited-forward' | 'visited-backward' | 'path' | 'current-forward' | 'current-backward' | 'intersection';
+	side?: 'forward' | 'backward';
+	level?: number;
+}
+
+export interface BFSResult {
+	path: string[];
+	steps: BFSStep[];
+	found: boolean;
+	intersectionNode?: string;
+}
+
+export interface MultiGoalResult {
+	goals: string[];
+	paths: Map<string, string[]>;
+	optimalTour: string[];
+	steps: BFSStep[];
+}
