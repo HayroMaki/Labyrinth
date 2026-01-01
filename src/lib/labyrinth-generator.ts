@@ -9,7 +9,7 @@ function parseKey(key: string): { x: number; y: number } {
 	return { x, y };
 }
 
-export function generateLabyrinth(width: number, height: number): Graph {
+export function generateLabyrinth(width: number, height: number, wallRemovalPercent: number = 25): Graph {
 	const cells: Cell[][] = [];
 	
 	for (let y = 0; y < height; y++) {
@@ -48,6 +48,11 @@ export function generateLabyrinth(width: number, height: number): Graph {
 		}
 	}
 
+	// Remove additional walls randomly to create multiple paths
+	if (wallRemovalPercent > 0) {
+		removeRandomWalls(cells, width, height, wallRemovalPercent);
+	}
+
 	return cellsToGraph(cells, width, height);
 }
 
@@ -79,6 +84,49 @@ function removeWall(cell1: Cell, cell2: Cell): void {
 	} else if (dy === -1) {
 		cell1.walls.top = false;
 		cell2.walls.bottom = false;
+	}
+}
+
+function removeRandomWalls(cells: Cell[][], width: number, height: number, removalPercent: number): void {
+	const allWalls: Array<{ cell: Cell; direction: 'top' | 'right' | 'bottom' | 'left' }> = [];
+	
+	// Collect all existing walls
+	for (let y = 0; y < height; y++) {
+		for (let x = 0; x < width; x++) {
+			const cell = cells[y][x];
+			if (cell.walls.top && y > 0) allWalls.push({ cell, direction: 'top' });
+			if (cell.walls.right && x < width - 1) allWalls.push({ cell, direction: 'right' });
+			if (cell.walls.bottom && y < height - 1) allWalls.push({ cell, direction: 'bottom' });
+			if (cell.walls.left && x > 0) allWalls.push({ cell, direction: 'left' });
+		}
+	}
+	
+	// Calculate how many walls to remove
+	const wallsToRemove = Math.floor(allWalls.length * (removalPercent / 100));
+	
+	// Shuffle and remove random walls
+	for (let i = 0; i < wallsToRemove; i++) {
+		const randomIndex = Math.floor(Math.random() * allWalls.length);
+		const { cell, direction } = allWalls[randomIndex];
+		
+		// Remove wall from both sides
+		const { x, y } = cell;
+		if (direction === 'top' && y > 0) {
+			cell.walls.top = false;
+			cells[y - 1][x].walls.bottom = false;
+		} else if (direction === 'right' && x < width - 1) {
+			cell.walls.right = false;
+			cells[y][x + 1].walls.left = false;
+		} else if (direction === 'bottom' && y < height - 1) {
+			cell.walls.bottom = false;
+			cells[y + 1][x].walls.top = false;
+		} else if (direction === 'left' && x > 0) {
+			cell.walls.left = false;
+			cells[y][x - 1].walls.right = false;
+		}
+		
+		// Remove this wall from the array to avoid removing it twice
+		allWalls.splice(randomIndex, 1);
 	}
 }
 
