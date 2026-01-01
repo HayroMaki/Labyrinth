@@ -5,6 +5,7 @@ export interface GraphGeneratorOptions {
     height?: number;
     maxConnectionsPerNode?: number;
     connectionRadius?: number;
+    minNodeDistance?: number;
     seed?: number;
 }
 export declare function generateRandomGraph(options: GraphGeneratorOptions): GeneralGraph;

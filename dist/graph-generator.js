@@ -6,14 +6,31 @@ function seededRandom(seed) {
     };
 }
 export function generateRandomGraph(options) {
-    const { nodeCount, width = 600, height = 600, maxConnectionsPerNode = 5, connectionRadius = 150, seed } = options;
+    const { nodeCount, width = 600, height = 600, maxConnectionsPerNode = 5, connectionRadius = 150, minNodeDistance = 30, seed } = options;
     const random = seed !== undefined ? seededRandom(seed) : Math.random;
     const nodes = new Map();
     const padding = 50;
-    // Generate node positions in a rectangular cloud
+    const nodePositions = [];
+    // Generate node positions with minimum distance constraint
     for (let i = 0; i < nodeCount; i++) {
-        const x = padding + random() * (width - 2 * padding);
-        const y = padding + random() * (height - 2 * padding);
+        let x, y;
+        let attempts = 0;
+        const maxAttempts = 100;
+        do {
+            x = padding + random() * (width - 2 * padding);
+            y = padding + random() * (height - 2 * padding);
+            attempts++;
+            // Check if position is far enough from existing nodes
+            const tooClose = nodePositions.some(pos => {
+                const dx = pos.x - x;
+                const dy = pos.y - y;
+                return Math.sqrt(dx * dx + dy * dy) < minNodeDistance;
+            });
+            if (!tooClose || attempts >= maxAttempts) {
+                break;
+            }
+        } while (true);
+        nodePositions.push({ x, y });
         nodes.set(`n${i}`, {
             id: `n${i}`,
             x,

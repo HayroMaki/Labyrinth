@@ -128,10 +128,13 @@
 			const result = findOptimalMultiGoalPath(graph, computedStartNode, computedGoalNodes);
 			optimalPath = result.optimalPath;
 			
-			// Generate visualization steps for the optimal path
+			// Generate visualization steps by running BFS for each segment
 			steps = [];
-			for (const nodeId of optimalPath) {
-				steps.push({ nodeId, type: 'path' });
+			const tour = [computedStartNode, ...computedGoalNodes];
+			
+			for (let i = 0; i < tour.length - 1; i++) {
+				const segmentResult = bidirectionalBFS(graph, tour[i], tour[i + 1]);
+				steps.push(...segmentResult.steps);
 			}
 		} else {
 			const result = bidirectionalBFS(graph, computedStartNode, computedGoalNodes[0]);

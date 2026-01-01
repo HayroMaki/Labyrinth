@@ -6,6 +6,7 @@ export interface GraphGeneratorOptions {
 	height?: number;
 	maxConnectionsPerNode?: number;
 	connectionRadius?: number;
+	minNodeDistance?: number;
 	seed?: number;
 }
 
@@ -24,18 +25,39 @@ export function generateRandomGraph(options: GraphGeneratorOptions): GeneralGrap
 		height = 600, 
 		maxConnectionsPerNode = 5,
 		connectionRadius = 150,
+		minNodeDistance = 30,
 		seed 
 	} = options;
 	const random = seed !== undefined ? seededRandom(seed) : Math.random;
 	
 	const nodes = new Map<string, GeneralGraphNode>();
 	const padding = 50;
+	const nodePositions: Array<{ x: number; y: number }> = [];
 	
-	// Generate node positions in a rectangular cloud
+	// Generate node positions with minimum distance constraint
 	for (let i = 0; i < nodeCount; i++) {
-		const x = padding + random() * (width - 2 * padding);
-		const y = padding + random() * (height - 2 * padding);
+		let x: number, y: number;
+		let attempts = 0;
+		const maxAttempts = 100;
 		
+		do {
+			x = padding + random() * (width - 2 * padding);
+			y = padding + random() * (height - 2 * padding);
+			attempts++;
+			
+			// Check if position is far enough from existing nodes
+			const tooClose = nodePositions.some(pos => {
+				const dx = pos.x - x;
+				const dy = pos.y - y;
+				return Math.sqrt(dx * dx + dy * dy) < minNodeDistance;
+			});
+			
+			if (!tooClose || attempts >= maxAttempts) {
+				break;
+			}
+		} while (true);
+		
+		nodePositions.push({ x, y });
 		nodes.set(`n${i}`, {
 			id: `n${i}`,
 			x,
