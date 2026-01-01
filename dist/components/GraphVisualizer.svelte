@@ -252,7 +252,7 @@
 </script>
 
 <div class="graph-container" style={cssVars}>
-	<svg width={svgWidth} height={svgHeight} class="graph-svg">
+	<svg width={svgWidth} height={svgHeight}>
 		<defs>
 			<marker
 				id="arrowhead"
@@ -306,7 +306,6 @@
 			</text>
 		{/each}
 	</svg>
-
 </div>
 
 <style>
@@ -315,12 +314,5 @@
 		flex-direction: column;
 		gap: 1rem;
 		align-items: center;
-	}
-
-	.graph-svg {
-		background-color: white;
-		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-		border: 2px solid #e5e7eb;
-		border-radius: 0.5rem;
 	}
 </style>
