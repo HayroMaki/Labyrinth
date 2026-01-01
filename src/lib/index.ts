@@ -1,5 +1,5 @@
 export { generateLabyrinth } from './labyrinth-generator';
-export { generateRandomGraph } from './graph-generator';
+export { generateRandomGraph, findOppositeCornerNodes } from './graph-generator';
 export { dijkstra } from './algorithms/dijkstra';
 export { astar } from './algorithms/astar';
 export { bidirectionalBFS, findOptimalMultiGoalPath } from './algorithms/bidirectional-bfs';

@@ -8,9 +8,6 @@
 		goalNodes?: string[];
 		nodeRadius?: number;
 		autoPlay?: boolean;
-		buttons?: boolean;
-		legend?: boolean;
-		stepCount?: boolean;
 		animationSpeed?: number;
 		colors?: ColorScheme;
 		showMultiGoal?: boolean;
@@ -23,9 +20,6 @@
 		goalNodes = [],
 		nodeRadius = 20,
 		autoPlay = false,
-		buttons = true,
-		legend = true,
-		stepCount = true,
 		animationSpeed = 100,
 		colors,
 		showMultiGoal = false,
@@ -246,8 +240,12 @@
 		onControls?.(controlApi);
 	});
 
-	const svgWidth = 650;
-	const svgHeight = 650;
+	const svgWidth = $derived(
+		Math.max(...Array.from(graph.nodes.values()).map(n => n.x)) + 100
+	);
+	const svgHeight = $derived(
+		Math.max(...Array.from(graph.nodes.values()).map(n => n.y)) + 100
+	);
 </script>
 
 <div class="graph-container" style={cssVars}>
@@ -306,69 +304,6 @@
 		{/each}
 	</svg>
 
-	<div class="controls">
-		{#if buttons}
-			<button onclick={play} disabled={isPlaying}>Play</button>
-			<button onclick={pause} disabled={!isPlaying}>Pause</button>
-			<button onclick={reset}>Reset</button>
-			<button onclick={stepBackward} disabled={isPlaying || currentStepIndex === 0}>
-				Step Back
-			</button>
-			<button onclick={stepForward} disabled={isPlaying || currentStepIndex === steps.length}>
-				Step Forward
-			</button>
-		{/if}
-		{#if stepCount}
-			<span class="step-counter">
-				Step: {currentStepIndex} / {steps.length}
-			</span>
-		{/if}
-	</div>
-
-	{#if legend}
-		<div class="legend">
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: {colorScheme.start};"></div>
-				<span>Start</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: {colorScheme.end};"></div>
-				<span>Goal{computedGoalNodes.length > 1 ? 's' : ''}</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: {colorScheme.current};"></div>
-				<span>Forward</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: #f97316;"></div>
-				<span>Backward</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: {colorScheme.visiting};"></div>
-				<span>Forward Frontier</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: #fed7aa;"></div>
-				<span>Backward Frontier</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: {colorScheme.visited};"></div>
-				<span>Forward Visited</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: #fecaca;"></div>
-				<span>Backward Visited</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: #a855f7;"></div>
-				<span>Intersection</span>
-			</div>
-			<div class="legend-item">
-				<div class="legend-color" style="background-color: {colorScheme.path};"></div>
-				<span>Path</span>
-			</div>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -377,7 +312,6 @@
 		flex-direction: column;
 		gap: 1rem;
 		align-items: center;
-		padding: 1rem;
 	}
 
 	.graph-svg {
@@ -385,65 +319,5 @@
 		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 		border: 2px solid #e5e7eb;
 		border-radius: 0.5rem;
-	}
-
-	.controls {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-		flex-wrap: wrap;
-	}
-
-	.controls button {
-		padding: 0.5rem 1rem;
-		border: none;
-		border-radius: 0.375rem;
-		cursor: pointer;
-		font-weight: 500;
-		transition: background-color 0.2s;
-		background-color: var(--graph-buttons);
-		color: var(--graph-buttonstext);
-	}
-
-	.controls button:hover:not(:disabled) {
-		background-color: var(--graph-buttonshover);
-	}
-
-	.controls button:disabled {
-		background-color: var(--graph-buttonsdisabled);
-		cursor: not-allowed;
-	}
-
-	.step-counter {
-		padding: 0.5rem 1rem;
-		border-radius: 0.375rem;
-		font-weight: 500;
-		background-color: var(--graph-legend);
-		color: var(--graph-legend-text);
-	}
-
-	.legend {
-		display: flex;
-		gap: 1rem;
-		flex-wrap: wrap;
-		padding: 0.75rem;
-		border-radius: 0.5rem;
-		background-color: var(--graph-legend);
-		color: var(--graph-legend-text);
-		max-width: 650px;
-	}
-
-	.legend-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.875rem;
-	}
-
-	.legend-color {
-		width: 1.5rem;
-		height: 1.5rem;
-		border-radius: 0.25rem;
-		border: 1px solid var(--graph-legend-text);
 	}
 </style>

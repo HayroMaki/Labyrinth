@@ -5,9 +5,6 @@ interface Props {
     goalNodes?: string[];
     nodeRadius?: number;
     autoPlay?: boolean;
-    buttons?: boolean;
-    legend?: boolean;
-    stepCount?: boolean;
     animationSpeed?: number;
     colors?: ColorScheme;
     showMultiGoal?: boolean;

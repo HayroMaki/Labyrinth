@@ -6,17 +6,14 @@ function seededRandom(seed) {
     };
 }
 export function generateRandomGraph(options) {
-    const { nodeCount, avgDegree, seed } = options;
+    const { nodeCount, width = 600, height = 600, maxConnectionsPerNode = 5, connectionRadius = 150, seed } = options;
     const random = seed !== undefined ? seededRandom(seed) : Math.random;
     const nodes = new Map();
-    // Create nodes in a circular layout for better visualization
-    const radius = 200;
-    const centerX = 300;
-    const centerY = 300;
+    const padding = 50;
+    // Generate node positions in a rectangular cloud
     for (let i = 0; i < nodeCount; i++) {
-        const angle = (i / nodeCount) * 2 * Math.PI;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
+        const x = padding + random() * (width - 2 * padding);
+        const y = padding + random() * (height - 2 * padding);
         nodes.set(`n${i}`, {
             id: `n${i}`,
             x,
@@ -24,34 +21,88 @@ export function generateRandomGraph(options) {
             neighbors: []
         });
     }
-    // Connect nodes to create a connected graph
-    // First, create a spanning tree to ensure connectivity
-    const nodeIds = Array.from(nodes.keys());
-    const connected = new Set([nodeIds[0]]);
-    const unconnected = new Set(nodeIds.slice(1));
-    while (unconnected.size > 0) {
-        const connectedNode = Array.from(connected)[Math.floor(random() * connected.size)];
-        const unconnectedNode = Array.from(unconnected)[Math.floor(random() * unconnected.size)];
-        nodes.get(connectedNode).neighbors.push(unconnectedNode);
-        nodes.get(unconnectedNode).neighbors.push(connectedNode);
-        connected.add(unconnectedNode);
-        unconnected.delete(unconnectedNode);
-    }
-    // Add additional edges to reach target average degree
-    const targetEdges = Math.floor((nodeCount * avgDegree) / 2);
-    const currentEdges = nodeCount - 1; // from spanning tree
-    const edgesToAdd = targetEdges - currentEdges;
-    for (let i = 0; i < edgesToAdd; i++) {
-        const node1Id = nodeIds[Math.floor(random() * nodeIds.length)];
-        const node2Id = nodeIds[Math.floor(random() * nodeIds.length)];
-        if (node1Id === node2Id)
+    // Connect nodes based on proximity
+    const nodeArray = Array.from(nodes.values());
+    for (let i = 0; i < nodeArray.length; i++) {
+        const node = nodeArray[i];
+        // Skip if already at max connections
+        if (node.neighbors.length >= maxConnectionsPerNode)
             continue;
-        const node1 = nodes.get(node1Id);
-        const node2 = nodes.get(node2Id);
-        if (!node1.neighbors.includes(node2Id)) {
-            node1.neighbors.push(node2Id);
-            node2.neighbors.push(node1Id);
+        // Find nearby nodes
+        const distances = [];
+        for (let j = 0; j < nodeArray.length; j++) {
+            if (i === j)
+                continue;
+            const other = nodeArray[j];
+            // Skip if other node is at max connections
+            if (other.neighbors.length >= maxConnectionsPerNode)
+                continue;
+            // Skip if already connected
+            if (node.neighbors.includes(other.id))
+                continue;
+            const dx = node.x - other.x;
+            const dy = node.y - other.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance <= connectionRadius) {
+                distances.push({ nodeId: other.id, distance });
+            }
+        }
+        // Sort by distance and connect to closest nodes
+        distances.sort((a, b) => a.distance - b.distance);
+        const connectionsNeeded = Math.min(maxConnectionsPerNode - node.neighbors.length, distances.length);
+        for (let k = 0; k < connectionsNeeded; k++) {
+            const targetId = distances[k].nodeId;
+            const targetNode = nodes.get(targetId);
+            // Only connect if target isn't at max
+            if (targetNode.neighbors.length < maxConnectionsPerNode) {
+                node.neighbors.push(targetId);
+                targetNode.neighbors.push(node.id);
+            }
+        }
+    }
+    // Ensure all nodes have at least one connection
+    for (const node of nodeArray) {
+        if (node.neighbors.length === 0) {
+            // Find closest node that can accept a connection
+            let closestNode = null;
+            let closestDistance = Infinity;
+            for (const other of nodeArray) {
+                if (other.id === node.id)
+                    continue;
+                if (other.neighbors.length >= maxConnectionsPerNode)
+                    continue;
+                const dx = node.x - other.x;
+                const dy = node.y - other.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestNode = other;
+                }
+            }
+            if (closestNode) {
+                node.neighbors.push(closestNode.id);
+                closestNode.neighbors.push(node.id);
+            }
         }
     }
     return { nodes };
+}
+export function findOppositeCornerNodes(graph) {
+    const nodeArray = Array.from(graph.nodes.values());
+    let topLeftNode = nodeArray[0];
+    let bottomRightNode = nodeArray[0];
+    for (const node of nodeArray) {
+        // Top-left: minimize x + y
+        if (node.x + node.y < topLeftNode.x + topLeftNode.y) {
+            topLeftNode = node;
+        }
+        // Bottom-right: maximize x + y
+        if (node.x + node.y > bottomRightNode.x + bottomRightNode.y) {
+            bottomRightNode = node;
+        }
+    }
+    return {
+        topLeft: topLeftNode.id,
+        bottomRight: bottomRightNode.id
+    };
 }
