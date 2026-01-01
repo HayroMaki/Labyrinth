@@ -123,12 +123,42 @@
 		new Set(steps.slice(0, currentStepIndex).filter((s) => s.type === 'path').map((s) => s.nodeId))
 	);
 
+	const permutationTestNodes = $derived(
+		new Set(
+			steps
+				.slice(0, currentStepIndex)
+				.filter((s) => s.type === 'permutation-test')
+				.map((s) => s.nodeId)
+		)
+	);
+
+	const permutationBestNodes = $derived(
+		new Set(
+			steps
+				.slice(0, currentStepIndex)
+				.filter((s) => s.type === 'permutation-best')
+				.map((s) => s.nodeId)
+		)
+	);
+
+	const currentPermutationInfo = $derived(() => {
+		const currentStep = steps[currentStepIndex - 1];
+		if (currentStep?.type === 'permutation-test' || currentStep?.type === 'permutation-best') {
+			return {
+				index: currentStep.permutationIndex ?? 0,
+				length: currentStep.permutationLength ?? 0,
+				isBest: currentStep.isBest ?? false
+			};
+		}
+		return null;
+	});
+
 	function runAlgorithm() {
 		if (showMultiGoal && computedGoalNodes.length > 1) {
 			const result = findOptimalMultiGoalPath(graph, computedStartNode, computedGoalNodes);
 			optimalPath = result.optimalPath;
 			
-			// Generate visualization steps by running BFS for each segment
+			// First show BFS exploration for each pair
 			steps = [];
 			const tour = [computedStartNode, ...computedGoalNodes];
 			
@@ -136,6 +166,9 @@
 				const segmentResult = bidirectionalBFS(graph, tour[i], tour[i + 1]);
 				steps.push(...segmentResult.steps);
 			}
+			
+			// Then show permutation comparison phase
+			steps.push(...result.permutationSteps);
 		} else {
 			const result = bidirectionalBFS(graph, computedStartNode, computedGoalNodes[0]);
 			steps = result.steps;
@@ -198,6 +231,8 @@
 	function getNodeColor(nodeId: string): string {
 		if (nodeId === computedStartNode) return colorScheme.start;
 		if (computedGoalNodes.includes(nodeId)) return colorScheme.end;
+		if (permutationBestNodes.has(nodeId)) return '#10b981'; // Green for best permutation
+		if (permutationTestNodes.has(nodeId)) return '#fbbf24'; // Yellow for testing permutation
 		if (pathNodes.has(nodeId)) return colorScheme.path;
 		if (nodeId === intersectionNode) return '#a855f7';
 		if (nodeId === currentForwardNode) return colorScheme.current;
@@ -252,7 +287,20 @@
 </script>
 
 <div class="graph-container" style={cssVars}>
-	<svg width={svgWidth} height={svgHeight}>
+	{#if currentPermutationInfo()}
+		<div class="permutation-info">
+			{#if currentPermutationInfo()?.isBest}
+				<span class="font-mono text-sm font-bold" style="color: #10b981;">
+					✓ Best permutation found! Length: {currentPermutationInfo()?.length}
+				</span>
+			{:else}
+				<span class="font-mono text-sm">
+					Testing permutation #{(currentPermutationInfo()?.index ?? 0) + 1} - Length: {currentPermutationInfo()?.length}
+				</span>
+			{/if}
+		</div>
+	{/if}
+	<svg width={svgWidth} height={svgHeight} class="graph-svg">
 		<defs>
 			<marker
 				id="arrowhead"
@@ -314,5 +362,20 @@
 		flex-direction: column;
 		gap: 1rem;
 		align-items: center;
+	}
+
+	.graph-svg {
+		background-color: white;
+		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+		border: 2px solid #e5e7eb;
+		border-radius: 0.5rem;
+	}
+
+	.permutation-info {
+		padding: 0.75rem 1.5rem;
+		background-color: #f9fafb;
+		border: 2px solid #1f2937;
+		border-radius: 0.25rem;
+		text-align: center;
 	}
 </style>

@@ -72,9 +72,13 @@ export interface GeneralGraph {
 }
 export interface BFSStep {
     nodeId: string;
-    type: 'start-forward' | 'start-backward' | 'goal-forward' | 'goal-backward' | 'visited-forward' | 'visited-backward' | 'path' | 'current-forward' | 'current-backward' | 'intersection';
+    type: 'start-forward' | 'start-backward' | 'goal-forward' | 'goal-backward' | 'visited-forward' | 'visited-backward' | 'path' | 'current-forward' | 'current-backward' | 'intersection' | 'permutation-test' | 'permutation-best';
     side?: 'forward' | 'backward';
     level?: number;
+    permutationIndex?: number;
+    permutationPath?: string[];
+    permutationLength?: number;
+    isBest?: boolean;
 }
 export interface BFSResult {
     path: string[];

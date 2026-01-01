@@ -109,6 +109,8 @@ function permutations(arr) {
 }
 export function findOptimalMultiGoalPath(graph, startId, goalIds) {
     const allPaths = new Map();
+    const permutationSteps = [];
+    const testedPermutations = [];
     // Compute paths between all pairs
     const allNodes = [startId, ...goalIds];
     for (const from of allNodes) {
@@ -126,8 +128,10 @@ export function findOptimalMultiGoalPath(graph, startId, goalIds) {
     // Try all permutations to find shortest tour
     let shortestPath = [];
     let shortestLength = Infinity;
+    let bestPermIndex = -1;
     const goalPermutations = permutations(goalIds);
-    for (const perm of goalPermutations) {
+    for (let permIndex = 0; permIndex < goalPermutations.length; permIndex++) {
+        const perm = goalPermutations[permIndex];
         const tour = [startId, ...perm];
         let totalPath = [];
         let valid = true;
@@ -144,10 +148,38 @@ export function findOptimalMultiGoalPath(graph, startId, goalIds) {
                 totalPath = [...totalPath.slice(0, -1), ...segment];
             }
         }
-        if (valid && totalPath.length < shortestLength) {
-            shortestPath = totalPath;
-            shortestLength = totalPath.length;
+        if (valid) {
+            testedPermutations.push({ path: totalPath, length: totalPath.length, tour });
+            // Add visualization step for this permutation test
+            for (const nodeId of totalPath) {
+                permutationSteps.push({
+                    nodeId,
+                    type: 'permutation-test',
+                    permutationIndex: permIndex,
+                    permutationPath: totalPath,
+                    permutationLength: totalPath.length,
+                    isBest: false
+                });
+            }
+            if (totalPath.length < shortestLength) {
+                shortestPath = totalPath;
+                shortestLength = totalPath.length;
+                bestPermIndex = permIndex;
+            }
         }
     }
-    return { optimalPath: shortestPath, allPaths };
+    // Mark the best permutation
+    if (bestPermIndex >= 0) {
+        for (const nodeId of shortestPath) {
+            permutationSteps.push({
+                nodeId,
+                type: 'permutation-best',
+                permutationIndex: bestPermIndex,
+                permutationPath: shortestPath,
+                permutationLength: shortestLength,
+                isBest: true
+            });
+        }
+    }
+    return { optimalPath: shortestPath, allPaths, permutationSteps, testedPermutations };
 }
